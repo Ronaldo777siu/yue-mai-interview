@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>粤脉工坊 · 面试结果查询</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+    padding: 20px;
+  }
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(30, 41, 59, 0.12);
+    padding: 40px 36px 32px;
+    text-align: center;
+  }
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35);
+  }
+  h1 { font-size: 22px; color: #1e293b; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #94a3b8; margin-bottom: 28px; }
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #1e293b;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+  button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .2s;
+    white-space: nowrap;
+  }
+  button:hover { box-shadow: 0 8px 18px rgba(99, 102, 241, 0.35); transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+  .result {
+    display: none;
+    margin-top: 20px;
+    padding: 20px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .result.pass { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+  .result.fail { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+  .result .status { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .result .dept { display: inline-block; margin-top: 6px; padding: 6px 16px; border-radius: 999px; background: #eef2ff; color: #4f46e5; font-weight: 600; }
+  .hint { font-size: 12px; color: #cbd5e1; margin-top: 18px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">粤</div>
+    <h1>粤脉工坊 · 面试结果查询</h1>
+    <p class="subtitle">输入姓名，查询面试结果与录取部门</p>
+
+    <div class="input-group">
+      <input type="text" id="nameInput" placeholder="请输入姓名，如：张展杰" maxlength="20" autocomplete="off">
+      <button id="btnQuery">查询</button>
+    </div>
+
+    <div class="result" id="resultBox">
+      <div class="status" id="statusText"></div>
+      <div id="deptText"></div>
+    </div>
+
+    <p class="hint">支持按 Enter 键查询</p>
+  </div>
+
+<script>
+  // 内置录取名单：姓名 -> 录取部门
+  const ADMISSION = {
+    "张展杰": "实践部",
+    "蓝卓帆": "实践部",
+    "常熙蕾": "会展部",
+    "郭欣豪": "会展部",
+    "张铱淳": "项目部",
+    "彭俊辉": "项目部",
+    "陈冠成": "宣传部",
+    "周晓彤": "宣传部",
+    "廖慧怡": "秘书部",
+    "邓舜尧": "秘书部",
+    "黄依晨": "技术部",
+    "王诗诗": "技术部",
+    "刘紫钰": "策划部",
+    "曾杰": "策划部"
+  };
+
+  const input = document.getElementById("nameInput");
+  const btn = document.getElementById("btnQuery");
+  const box = document.getElementById("resultBox");
+  const statusText = document.getElementById("statusText");
+  const deptText = document.getElementById("deptText");
+
+  function query() {
+    const name = input.value.trim();
+    if (!name) {
+      box.className = "result fail";
+      box.style.display = "block";
+      statusText.textContent = "请输入姓名";
+      deptText.textContent = "";
+      return;
+    }
+    const dept = ADMISSION[name];
+    if (dept) {
+      box.className = "result pass";
+      statusText.textContent = "面试通过 ✔";
+      deptText.innerHTML = '<span class="dept">录取部门：' + dept + '</span>';
+    } else {
+      box.className = "result fail";
+      statusText.textContent = "未通过 / 未录取";
+      deptText.textContent = "该姓名不在录取名单中";
+    }
+    box.style.display = "block";
+  }
+
+  btn.addEventListener("click", query);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") query();
+  });
+  input.focus();
+</script>
+</body>
+</html>
